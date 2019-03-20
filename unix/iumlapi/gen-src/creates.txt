@@ -1,0 +1,43 @@
+ORG     DB      D       create_domain                   name    number  key_letter      type:string     has_packages:bool
+ORG     DB      G       add_access_group                name
+ORG     DB      P       create_project                  name  number  key_letter
+ORG     DB      U       add_user                        user_name       user_login
+ORG     D       DV      create_domain_version           parent_number:version_number    name    version_number  status:string
+ORG     P       PV      create_project_version          parent_number:version_number    name    version_number  status:string
+ORG     PV      BS      add_build_set                   build_set_name
+TAGS    TG      T       create_tag                      name    tag_type:#
+TAGS    TO      TG      create_tag_group                name
+TAGS    T       TGE     add_tag_enumeration             name
+XUML    AA      ATERM   create_association_terminator   name    terminator_key_letter
+XUML    AA      C       create_class                    class_name      class_number    class_key_letter
+XUML    AA      DAT     create_data_type                data_type_name  base_type:#long
+XUML    AA      DOMOP   create_operation                number:long     name:string
+XUML    AA      ISEQ    create_initialisation_sequence  sequence_name
+XUML    AA      NCTERM  create_terminator               name    terminator_key_letter
+XUML    AA      SEG     create_initialisation_segment   name    number
+XUML    AA      STERM   create_specialisation_terminator        name    terminator_key_letter
+XUML    AA      TM      create_test_method              name    number
+XUML    AA      TMS     create_test_method_set          name
+XUML    ASM     AST     create_assigner_state           state_name      state_number
+XUML    ASSIG   SIGP    create_signal_parameter         parameter_name
+XUML    ATERM   ATOP    create_operation                name:string     number:long
+XUML    ATOP    OPP     create_operation_parameter      name    data_type_mode:#long
+XUML    C       A       create_attribute                attribute_name  data_type_name
+XUML    C       ASM     create_assigner_state_machine
+XUML    C       ASSIG   create_assigner_signal          name:string     signal_number
+XUML    C       COP     create_operation                number:long     name:string
+XUML    C       I       create_identifier
+XUML    C       ISM     create_class_state_machine
+XUML    COP     OPP     create_operation_parameter      name    data_type_mode:#long
+XUML    C       SIG     create_signal                   name:string     signal_number
+XUML    DOMOP   OPP     create_operation_parameter      name    data_type_mode:#long
+XUML    ISM     IS      create_state                    name:string     state_number
+XUML    NCTERM  NCTOP   create_operation                number:long     name:string
+XUML    NCTERM  TSIG    create_terminator_signal        name:string     signal_number
+XUML    NCTOP   OPP     create_operation_parameter      name    data_type_mode:#long
+XUML    SIG     SIGP    create_signal_parameter         parameter_name
+XUML    STERM   STOP    create_operation                number:long     name:string
+XUML    STOP    OPP     create_operation_parameter      name    data_type_mode:#long
+XUML    TSIG    SIGP    create_signal_parameter         parameter_name
+XUML    UDDT    DSMEM   create_data_structure_member    structure_member_name
+XUML    UDDT    EE      add_enumeration                 enumeration_name        enumeration_value

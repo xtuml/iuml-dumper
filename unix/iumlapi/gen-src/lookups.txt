@@ -1,0 +1,12 @@
+TAGS TO R4 name
+TAGS TG R3 name
+TAGS T R6 name
+ORG DB R3 key_letter
+ORG DB R5 key_letter
+ORG D R4 version_number
+ORG P R6 version_number
+ORG PV R20 build_set_number
+XUML AA R221 data_type_name
+XUML AA R224 class_key_letter
+XUML C R9 attribute_name
+
