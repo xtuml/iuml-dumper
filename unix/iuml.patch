@@ -1,0 +1,279 @@
+diff -ur orig/api/tools/API.tool/UML.esl patched/api/tools/API.tool/UML.esl
+--- orig/api/tools/API.tool/UML.esl	2016-04-25 16:53:08.817333000 +0100
++++ patched/api/tools/API.tool/UML.esl	2016-04-25 16:55:19.854394000 +0100
+@@ -15510,11 +15510,12 @@
+ 
+   if !valid then return [FALSE]; endif;
+ 
+-  map := map_editable_attributes(attribute_owner,attribute);
++  map := map_editable_attributes(attribute_owner,attribute,value);
+ 
+   new_entity := map[1];
+   attribute := map[2];
+   type := map[3];
++  value := map[5];
+ 
+   case type
+     when API_STRING :
+@@ -18223,6 +18224,15 @@
+ 	]];
+ 
+     -- 'Tagged Item'
++[["domain_version_slot"]; [
++["R1";			["domain_in_build_set";"tag_values";"tag";"tag_group";"TAG_OWNER"]];
++["R2";			["domain_in_build_set";"tag_values";"tag"]];
++["R2.T";		["domain_in_build_set";"tag_values";"tag"]];
++["R2.Tag";		["domain_in_build_set";"tag_values";"tag"]];
++["R2.TA";		["domain_in_build_set";"tag_values"]];
++["R2.Tag_Attachment";	["domain_in_build_set";"tag_values"]]
++]];
++    -- 'Tagged Item'
+     [["event_requirement";
+       "ss_requirement";
+       "assigner_event";
+@@ -18790,6 +18800,7 @@
+   xuml_associations_tuple := [
+ 
+   ["domain_version"; [
++	["R999";	["supp_code_blocks"]];
+ 	["R221";	["OOA_R221"]];
+ 	["R238";	["OOA_R238"]];
+ 	["R222";	["OOA_R222"]];
+@@ -19487,6 +19498,7 @@
+   -- build_set_associations
+   build_set_associations_tuple := [
+     ["build_set"; [
++	["R999";	["supp_code_blocks"]];
+ 	["R112";	["BS_R112"]];
+ 	["R102";	["BS_R102"]];
+ 	["R63";		["BS_R63"]];
+@@ -29013,6 +29025,7 @@
+ 
+   entity := $[1];
+   attribute := $[2];
++  value := $[3];
+ 
+   type := 0;
+   long_text := FALSE;
+@@ -29115,6 +29128,7 @@
+           type := API_STRING;
+           break;
+         when "bridge_specification":
++        when "bridge_method":
+           if DME_rel_defined(entity,"is_defined_by",[]) then
+             new_entity := TBD_read_rel(entity,"is_defined_by",[]);
+           endif;
+@@ -29137,6 +29151,7 @@
+           attribute := "contract_desc";
+           break;
+         when "bridge_specification":
++        when "bridge_method":
+           if DME_rel_defined(entity,"is_defined_by",[]) then
+             new_entity := TBD_read_rel(entity,"is_defined_by",[]);
+           endif;
+@@ -29222,6 +29237,7 @@
+     when "existing_instance_state":
+       case attribute
+         when "action":
++        when "method":
+           new_entity := TBD_read_rel(entity,"action",[]);
+           attribute := "desc";
+           type := API_LONG_STRING;
+@@ -29245,6 +29261,7 @@
+     when "assigner_state":
+       case attribute
+         when "action":
++        when "method":
+           new_entity := TBD_read_rel(entity,"action",[]);
+           attribute := "desc";
+           type := API_LONG_STRING;
+@@ -29291,6 +29308,7 @@
+     when "external":
+       case attribute
+         when "action":
++        when "method":
+           attribute := "ASL";
+           type := API_LONG_STRING;
+           break;
+@@ -29302,6 +29320,15 @@
+           break;
+       endcase;
+       break;
++
++    when "supp_code":
++      case attribute
++        when "asl":
++          attribute := "ASL";
++          type := API_LONG_STRING;
++          break;
++      endcase;
++      break;
+ 
+     when "object":                               -- CLASS
+       case attribute
+@@ -29357,6 +29384,15 @@
+           new_entity := TBD_read_rel(entity,"action",[]);
+           type := API_LONG_STRING;
+           break;
++        when "is_instance_based" :
++          attribute := "inst_object";
++          type := API_STRING;
++          if value = TRUE then
++             value := "Object";
++          else
++             value := "Class";
++          endif;
++          break;
+       endcase;
+       break;
+ 
+@@ -29403,6 +29439,7 @@
+     when "terminator_event":
+       case attribute
+         when "action":
++        when "method":
+           new_entity := TBD_read_rel(entity,"action",[]);
+           attribute := "desc";
+           type := API_LONG_STRING;
+@@ -29425,6 +29462,7 @@
+           type := API_STRING;
+           break;
+         when "action" :
++        when "method":
+           new_entity := TBD_read_rel(entity,"action",[]);
+           attribute := "desc";
+           type := API_LONG_STRING;
+@@ -29650,7 +29688,7 @@
+     new_entity := entity."$SELF"; 
+   endif;
+ 
+-  return [new_entity ; attribute; type; long_text];
++    return [new_entity ; attribute; type; long_text; value];
+ 
+ enddef;
+ 
+diff -ur orig/tools/UML.tool/UML.fesl patched/tools/UML.tool/UML.fesl
+--- orig/tools/UML.tool/UML.fesl	2016-04-25 16:53:49.354663000 +0100
++++ patched/tools/UML.tool/UML.fesl	2016-04-25 16:54:47.909130000 +0100
+@@ -171214,12 +171214,8 @@
+        while TRUE do
+          tag := TBD_next(iter);
+          if (is_undefined( tag )) then break ; endif;
+-         if is_undefined(search_table(current,tag."name")) then
+-           list := list + [TBD_attribute_show(tag,"name")];
+-           tags := tags + [tag];
+-         else
+-           TBD_release(tag);
+-         endif;
++         list := list + [TBD_attribute_show(tag,"name")];
++         tags := tags + [tag];
+        endwhile;
+        TBD_release(iter);
+        destroy_table(current);
+@@ -322378,11 +322374,16 @@
+     return [FALSE];
+   endif;
+ 
++case parameters[1]
++when 1 :
++when 2 :
+   access := UML_check_partition_access(entity_list[1]);
+   if access = NON_WRITABLE then
+     API_exception(API_INVALID_CALL,[function_name;"partition is not writable"]);
+ 	return [FALSE];
+   endif;
++break;
++endcase ;
+ 
+ --
+ -- /VALIDATE (GENERIC)
+@@ -322471,8 +322472,13 @@
+ 	  UML_set_partition_access(project_version,FROZEN);
+       break;
+     when 3 : -- unfreeze
+-      void := TBD_attribute_update(project_version,"locked", FALSE);
+-	  UML_set_partition_access(project_version,WRITABLE);
++      ret := OOA_PV_acquire(project_version);
++      if ret[1] then
++        pv := ret[2];
++        void := TBD_attribute_update(pv,"locked", FALSE);
++        UML_set_partition_access(pv,WRITABLE);
++        TBD_release(pv);
++      endif;  
+       break;
+     otherwise :
+       API_exception(API_INVALID_PARAMETER,[function_name;"invalid freeze type, (Temp 1, Perm 2, Unfreeze 3)"]);
+@@ -327449,8 +327455,9 @@
+ --
+ 
+   ESL_event_gen(CORE_EVENT,"OOA_event_take",[OOA_SYNCH_SERVICE;2;OPERATION."$SELF"]);
++  ESL_trigger_event_manager();
+ 
+-  OOA_TRIGGER_service_definition_changed(OPERATION);
++--  OOA_TRIGGER_service_definition_changed(OPERATION);
+ 
+   return [TRUE];
+ --
+@@ -331277,11 +331284,16 @@
+     return [FALSE];
+   endif;
+ 
++case parameters[1]
++when 1 :
++when 2 :
+   access := UML_check_partition_access(entity_list[1]);
+   if access = NON_WRITABLE then
+     API_exception(API_INVALID_CALL,[function_name;"partition is not writable"]);
+ 	return [FALSE];
+   endif;
++break;
++endcase ;
+ 
+ --
+ -- /VALIDATE (GENERIC)
+@@ -331383,8 +331395,13 @@
+       void := TBD_attribute_update(domain_version,"frozen", TRUE); 
+       break;
+     when 3 : -- unfreeze
+-      void := TBD_attribute_update(domain_version,"locked", FALSE);
+-      UML_set_partition_access(domain_version,WRITABLE);
++      ret := OOA_DV_acquire(domain_version);
++      if ret[1] then
++        dv := ret[2];
++        void := TBD_attribute_update(dv,"locked", FALSE);
++        UML_set_partition_access(dv,WRITABLE);
++        TBD_release(dv);
++      endif;
+       break;
+     otherwise :
+       API_exception(API_INVALID_PARAMETER,[function_name;"invalid freeze type, (Temp 1, Perm 2, Unfreeze 3)"]);
+@@ -340071,29 +340088,6 @@
+    tag := entity_list[2];
+ 
+ --
+--- VALIDATE (SPECIFIC)
+--- 
+-
+-  -- check to see if tag is already attached
+-
+-  iter := TBD_read_rel(entity_to_tag,"tag_values",[]);
+-  while TRUE do
+-    tag_value := TBD_next(iter);
+-    if Status = TBD_ITERATOR_ENDED then break ; endif;
+-    linked_tag := TBD_read_rel(tag_value,"tag",[]);
+-
+-    if same_entity(linked_tag,tag) then
+-      API_exception(API_INVALID_PARAMETER,[function_name;"tag is already attached to entity"]);
+-      TBD_release(linked_tag);
+-      return [TRUE;tag_value];
+-    endif;
+-
+-    TBD_release(linked_tag);
+-    TBD_release(tag_value);
+-  endwhile;
+-  TBD_release(iter);
+-  
+---
+ -- ATTACH TAG 
+ --
+ 

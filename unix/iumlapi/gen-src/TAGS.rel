@@ -1,0 +1,14 @@
+R2,T,conditionally,is_attached_to,many,TA,isassoc
+R2,TA,unconditionally,is_attached_with,one,T,
+R2,TI,unconditionally,is_attached_with,many,TA,isassoc
+R2,TA,unconditionally,is_attached_to,one,TI,
+R2,T,conditionally,is_attached_to,many,TI,
+R2,TI,unconditionally,is_attached_with,many,T,
+R3,TG,conditionally,contains,many,T,
+R3,T,unconditionally,is_defined_for,one,TG,
+R4,TO,unconditionally,owns,many,TG,
+R4,TG,unconditionally,belongs_to,one,TO,
+R6,T,conditionally,has,many,TGE,
+R6,TGE,unconditionally,is_defined_for_an_enumeration_based,one,T,
+R7,TGE,conditionally,defines_enumeration_for,many,TA,
+R7,TA,conditionally,has_enumeration_defined_by,one,TGE,
