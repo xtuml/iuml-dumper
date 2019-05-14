@@ -1,0 +1,7 @@
+= Windows and WASL Mods
+
+These files are patched versions of the unix files and build on Windows
+using Microsoft Visual Studio.  The changes are _not_ compatible with Unix.
+
+Note, there are additions.  OOA of OOA information required by ASL-dialect
+models is emitted with these changes.
