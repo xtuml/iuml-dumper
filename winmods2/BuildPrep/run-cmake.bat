@@ -1,0 +1,1 @@
+cmake -DBoost_DIR=D:\boost\boost_1_69_0 -DBoost_INCLUDE_DIR=D:\boost\boost_1_69_0 ..\..\iUML_dumper
